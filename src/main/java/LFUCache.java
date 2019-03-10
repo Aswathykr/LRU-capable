@@ -5,79 +5,88 @@ import java.util.Map;
 
 public class LFUCache {
 
-    Map<LFUNode, LFUNodeList> lookupMap;
+    Map<String, LFUNode> lookupMap;
     LFUNodeList headFrequencyListNode;
 
     public LFUCache() {
-        lookupMap = new HashMap<LFUNode, LFUNodeList>();
+        lookupMap = new HashMap<String, LFUNode>();
         headFrequencyListNode = new LFUNodeList(1);
     }
 
-    public void addNewLFUNode(LFUNode node)throws KeyAlreadyExistsException{
-        if(lookupMap.get(node) != null){
+    public void addNewLFUNode(String data)throws KeyAlreadyExistsException{
+        LFUNode node = new LFUNode(data);
+        if(lookupMap.get(node.getData()) != null){
             throw new KeyAlreadyExistsException();
         }
         if(headFrequencyListNode == null){
             headFrequencyListNode = new LFUNodeList(1);
         }
-        if(headFrequencyListNode.getFrequency() == 1) {
-            headFrequencyListNode.addToList(node);
-        }else{
+        else if(headFrequencyListNode.getFrequency() != 1) {
             LFUNodeList newHead = new LFUNodeList(1);
             newHead.setNextNode(headFrequencyListNode);
             headFrequencyListNode.setPrevNode(newHead);
             headFrequencyListNode = newHead;
         }
-        lookupMap.put(node, headFrequencyListNode);
+
+        headFrequencyListNode.addToList(node);
+        node.parent = headFrequencyListNode;
+        lookupMap.put(node.getData(), node);
     }
 
-    public int accessLFUNode(LFUNode node){
+    public int accessLFUNode(String data){
         LFUNodeList newFrequencyListNode = null;
-        LFUNodeList currentFrequencyListNode = lookupMap.get(node);
-        if(currentFrequencyListNode == null){
+        LFUNode node = lookupMap.get(data);
+        if(node == null){
             throw new IllegalArgumentException("Node not Present");
         }
 
+        LFUNodeList currentFrequencyListNode = node.getParent();
         LFUNodeList nextFrequencyListNode = currentFrequencyListNode.getNextNode();
+
         int newFrequency = currentFrequencyListNode.getFrequency() + 1;
-        if(nextFrequencyListNode!= null && nextFrequencyListNode.getFrequency() == newFrequency){
+
+        if(nextFrequencyListNode != null && nextFrequencyListNode.getFrequency() == newFrequency){
             nextFrequencyListNode.addToList(node);
+            node.setParent(nextFrequencyListNode);
             newFrequencyListNode = nextFrequencyListNode;
         }else{
             newFrequencyListNode = new LFUNodeList(newFrequency);
             newFrequencyListNode.addToList(node);
             insertAfter(newFrequencyListNode, currentFrequencyListNode);
+            node.setParent(newFrequencyListNode);
         }
         deleteLFUNodeFromParent(node, currentFrequencyListNode);
-        lookupMap.put(node, newFrequencyListNode);
+        lookupMap.put(node.getData(), node);
         return newFrequency;
     }
 
     private void deleteLFUNodeFromParent(LFUNode node, LFUNodeList currentFrequencyListNode ) {
-        if(currentFrequencyListNode == null){
-            throw new IllegalArgumentException("Node not Present");
-        }
         currentFrequencyListNode.deleteFromList(node);
         if(currentFrequencyListNode.getListSize() == 0){
             delete(currentFrequencyListNode);
         }
     }
 
-    public void deleteLFUNode(LFUNode node) {
-        LFUNodeList currentFrequencyListNode = lookupMap.get(node);
-        deleteLFUNodeFromParent(node, currentFrequencyListNode);
-        lookupMap.remove(node);
+    public void deleteLFUNode(String data) {
+
+        LFUNode node = lookupMap.get(data);
+        if(node == null){
+            throw new IllegalArgumentException("Node not Present");
+        }
+        deleteLFUNodeFromParent(node, node.getParent());
+        lookupMap.remove(node.getData());
     }
 
     private void delete(LFUNodeList currentFrequencyListNode) {
         if(currentFrequencyListNode == headFrequencyListNode) {
             headFrequencyListNode = currentFrequencyListNode.getNextNode();
             currentFrequencyListNode.setPrevNode(null);
-        }else
-        {
+        }else {
             LFUNodeList prevList = currentFrequencyListNode.getPrevNode();
             LFUNodeList nextList = currentFrequencyListNode.getNextNode();
-            prevList.setNextNode(nextList);
+            if(prevList != null) {
+                prevList.setNextNode(nextList);
+            }
             if(nextList != null) {
                 nextList.setPrevNode(prevList);
             }
@@ -89,7 +98,9 @@ public class LFUCache {
         frequencyListNode.setNextNode(newFrequencyListNode);
         newFrequencyListNode.setNextNode(nextFrequencyListNode);
         newFrequencyListNode.setPrevNode(frequencyListNode);
-        newFrequencyListNode.setPrevNode(newFrequencyListNode);
+        if(nextFrequencyListNode != null) {
+            nextFrequencyListNode.setPrevNode(newFrequencyListNode);
+        }
     }
 
     public int numberofNodesInHead(){
@@ -100,11 +111,11 @@ public class LFUCache {
         return count;
     }
 
-    public LFUNode popLFUNode(){
+    public String popLFUNode(){
         LFUNode node = null;
         if(headFrequencyListNode != null){
             node = headFrequencyListNode.popFromList();
         }
-        return node;
+        return node.getData();
     }
 }

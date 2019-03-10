@@ -8,156 +8,184 @@ public class LFUCacheTest {
 
     @Test
     public void addNewNodeTest(){
-        LFUNode node = new LFUNode("aswathy");
-        lfuCache.addNewLFUNode(node);
+        String data = "aswathy";
+        lfuCache.addNewLFUNode(data);
 
-        int newFrequency = lfuCache.accessLFUNode(node);
+        int newFrequency = lfuCache.accessLFUNode(data);
         Assert.assertEquals(newFrequency, 2);
     }
 
     @Test(expected = KeyAlreadyExistsException.class)
     public void addNewNodeAlreadyExistTest(){
-        LFUNode node = new LFUNode("data");
-        lfuCache.addNewLFUNode(node);
-        lfuCache.addNewLFUNode(node);
+        String data = "data";
+        lfuCache.addNewLFUNode(data);
+        lfuCache.addNewLFUNode(data);
     }
 
     @Test
     public void nodelookupTest(){
-        LFUNode node = new LFUNode("nodelookupTest");
-        lfuCache.addNewLFUNode(node);
+        String data = "nodelookupTest";
+        lfuCache.addNewLFUNode(data);
 
-        int newFrequency = lfuCache.accessLFUNode(node);
+        int newFrequency = lfuCache.accessLFUNode(data);
         Assert.assertEquals(newFrequency, 2);
-        newFrequency = lfuCache.accessLFUNode(node);
+        newFrequency = lfuCache.accessLFUNode(data);
         Assert.assertEquals(newFrequency, 3);
-        newFrequency = lfuCache.accessLFUNode(node);
+        newFrequency = lfuCache.accessLFUNode(data);
         Assert.assertEquals(newFrequency, 4);
 
     }
     @Test(expected = IllegalArgumentException.class)
     public void nodelookupNotExistTest(){
 
-        LFUNode node = new LFUNode("nodelookupNotExistTest");
-        int newFrequency = lfuCache.accessLFUNode(node);
+        String data = "nodelookupNotExistTest";
+        int newFrequency = lfuCache.accessLFUNode(data);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nodeDeleteFromHeadTest(){
-        LFUNode node = new LFUNode("nodeDeleteFromHeadTest");
-        lfuCache.addNewLFUNode(node);
+        String data = "nodeDeleteFromHeadTest";
+        lfuCache.addNewLFUNode(data);
 
-        lfuCache.deleteLFUNode(node);
+        lfuCache.deleteLFUNode(data);
 
-        int newFrequency = lfuCache.accessLFUNode(node);
+        int newFrequency = lfuCache.accessLFUNode(data);
 
     }
 
     @Test
     public void lastNodeDeleteFromHeadTest(){
         LFUCache cache = new LFUCache();
-        LFUNode node1 = new LFUNode("node1");
-        LFUNode node2 = new LFUNode("node2");
-        LFUNode node3 = new LFUNode("node3");
-        LFUNode node4 = new LFUNode("node4");
+        String data1 = "node1";
+        String data2 = "node2";
+        String data3 = "node3";
+        String data4 = "node4";
 
-        cache.addNewLFUNode(node1);
-        cache.addNewLFUNode(node2);
-        cache.addNewLFUNode(node3);
-        cache.addNewLFUNode(node4);
+        cache.addNewLFUNode(data1);
+        cache.addNewLFUNode(data2);
+        cache.addNewLFUNode(data3);
+        cache.addNewLFUNode(data4);
         Assert.assertEquals(cache.numberofNodesInHead(), 4);
 
-        cache.deleteLFUNode(node1);
+        cache.deleteLFUNode(data1);
         Assert.assertEquals(cache.numberofNodesInHead(), 3);
 
-        cache.deleteLFUNode(node2);
+        cache.deleteLFUNode(data2);
         Assert.assertEquals(cache.numberofNodesInHead(), 2);
 
-        cache.deleteLFUNode(node3);
+        cache.deleteLFUNode(data3);
         Assert.assertEquals(cache.numberofNodesInHead(), 1);
 
-        cache.deleteLFUNode(node4);
+        cache.deleteLFUNode(data4);
         Assert.assertEquals(cache.numberofNodesInHead(), 0);
+
+
+    }
+    @Test
+    public void insertionToNewFrequencyListTest(){
+        LFUCache cache = new LFUCache();
+        String data1 = "data1";
+        String data2 = "data2";
+        String data3 = "data3";
+        String data4 = "data4";
+
+        cache.addNewLFUNode(data1);
+        cache.addNewLFUNode(data2);
+
+        int frequency = cache.accessLFUNode(data1);
+        Assert.assertEquals(frequency, 2);
+
+        cache.addNewLFUNode(data3);
+        frequency = cache.accessLFUNode(data1);
+        Assert.assertEquals(frequency, 3);
+
+        //insert between 1 and 3 frquency
+        frequency = cache.accessLFUNode(data2);
+        Assert.assertEquals(frequency, 2);
 
 
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void nodeDeletefromMiddleTest(){
+    public void nodeDeleteFromMiddleTest(){
         LFUCache cache = new LFUCache();
-        LFUNode node1 = new LFUNode("node1");
-        LFUNode node2 = new LFUNode("node2");
-        LFUNode node3 = new LFUNode("node3");
-        LFUNode node4 = new LFUNode("node4");
+        String data1 = "data1";
+        String data2 = "data2";
+        String data3 = "data3";
+        String data4 = "data4";
 
-        cache.addNewLFUNode(node1);
-        cache.addNewLFUNode(node2);
+        cache.addNewLFUNode(data1);
+        cache.addNewLFUNode(data2);
 
-        cache.accessLFUNode(node1);
-        cache.accessLFUNode(node1);
+        cache.accessLFUNode(data1);
 
-        cache.addNewLFUNode(node3);
-        cache.accessLFUNode(node2);
+        cache.addNewLFUNode(data3);
+        cache.accessLFUNode(data2);
 
-        cache.addNewLFUNode(node4);
+        cache.accessLFUNode(data1);
+        cache.accessLFUNode(data2);
+        cache.accessLFUNode(data1);
 
-        cache.deleteLFUNode(node2);
+        cache.addNewLFUNode(data4);
+        cache.accessLFUNode(data3);
 
-        cache.accessLFUNode(node2); // Should throw an exception
+        cache.deleteLFUNode(data2);
+
+        cache.accessLFUNode(data2); // Should throw an exception
 
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nodeDeleteNotExistTest(){
         LFUCache cache = new LFUCache();
-        LFUNode node1 = new LFUNode("node1");
-        LFUNode node2 = new LFUNode("node2");
+        String data1 = "node1";
+        String data2 = "node2";
 
-        cache.addNewLFUNode(node1);
+        cache.addNewLFUNode(data1);
 
-        cache.deleteLFUNode(node2); // Should throw an exception
+        cache.deleteLFUNode(data2); // Should throw an exception
 
     }
     @Test
     public void addNewNodeToNewHeadTest(){
         LFUCache cache = new LFUCache();
-        LFUNode node1 = new LFUNode("node1");
-        LFUNode node2 = new LFUNode("node2");
+        String data1 = "data1";
+        String data2 = "data2";
 
-        cache.addNewLFUNode(node1);
-        cache.accessLFUNode(node1);
-        cache.accessLFUNode(node1);
+        cache.addNewLFUNode(data1);
+        cache.accessLFUNode(data1);
+        cache.accessLFUNode(data1);
 
-        cache.addNewLFUNode(node2);
+        cache.addNewLFUNode(data2);
 
 
     }
     @Test
     public void addNewNodeHeadNullTest(){
         LFUCache cache = new LFUCache();
-        LFUNode node1 = new LFUNode("node1");
-        LFUNode node2 = new LFUNode("node2");
+        String data1 = "data1";
+        String data2 = "data2";
 
-        cache.addNewLFUNode(node1);
-        cache.deleteLFUNode(node1);
+        cache.addNewLFUNode(data1);
+        cache.deleteLFUNode(data1);
 
-        cache.addNewLFUNode(node2);
+        cache.addNewLFUNode(data2);
 
     }
 
     @Test
     public void popLFUNodeTest(){
         LFUCache cache = new LFUCache();
-        LFUNode node1 = new LFUNode("node1");
-        LFUNode node2 = new LFUNode("node2");
+        String data1 = "node1";
+        String data2 = "node2";
 
-        cache.addNewLFUNode(node1);
-        cache.addNewLFUNode(node2);
+        cache.addNewLFUNode(data1);
+        cache.addNewLFUNode(data2);
 
-        cache.accessLFUNode(node1);
+        cache.accessLFUNode(data1);
 
-        LFUNode lfuNode = cache.popLFUNode();
-        Assert.assertEquals(lfuNode, node2);
+        String retrievedData = cache.popLFUNode();
+        Assert.assertEquals(retrievedData, data2);
     }
 
 }
