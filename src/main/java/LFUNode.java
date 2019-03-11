@@ -1,13 +1,13 @@
-public class LFUNode {
+public class LFUNode<T> {
 
-    String data;
+    T data;
     LFUNodeList parent;
 
-    public String getData() {
+    public T getData() {
         return data;
     }
 
-    public LFUNode(String data) {
+    public LFUNode(T data) {
         this.data = data;
     }
 

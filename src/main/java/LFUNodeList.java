@@ -1,9 +1,9 @@
 import java.util.HashSet;
 import java.util.Set;
 
-public class LFUNodeList {
+public class LFUNodeList<T> {
     int frequency;
-    Set<LFUNode> frequencyNodeList;
+    Set<LFUNode<T>> frequencyNodeList;
     LFUNodeList prevNode;
     LFUNodeList nextNode;
 
@@ -25,10 +25,10 @@ public class LFUNodeList {
 
     public LFUNodeList(int frequency) {
         this.frequency = frequency;
-        frequencyNodeList = new HashSet<LFUNode>();
+        frequencyNodeList = new HashSet<>();
     }
 
-    public void addToList(LFUNode node) {
+    public void addToList(LFUNode<T> node) {
         node.setParent(this);
         frequencyNodeList.add(node);
     }
@@ -37,7 +37,7 @@ public class LFUNodeList {
         return frequency;
     }
 
-    public void deleteFromList(LFUNode node) {
+    public void deleteFromList(LFUNode<T> node) {
         frequencyNodeList.remove(node);
     }
 
@@ -45,8 +45,8 @@ public class LFUNodeList {
         return frequencyNodeList.size();
     }
 
-    public LFUNode popFromList() {
-        LFUNode node = null;
+    public LFUNode<T> popFromList() {
+        LFUNode<T> node = null;
         if(frequencyNodeList.size() != 0) {
             node = frequencyNodeList.iterator().next();
             frequencyNodeList.remove(node);

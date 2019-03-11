@@ -4,7 +4,7 @@ import org.junit.Test;
 import javax.management.openmbean.KeyAlreadyExistsException;
 
 public class LFUCacheTest {
-    LFUCache lfuCache = new LFUCache();
+    LFUCache<String> lfuCache = new LFUCache();
 
     @Test
     public void addNewNodeTest(){
@@ -175,7 +175,7 @@ public class LFUCacheTest {
 
     @Test
     public void popLFUNodeTest(){
-        LFUCache cache = new LFUCache();
+        LFUCache<String> cache = new LFUCache();
         String data1 = "node1";
         String data2 = "node2";
 

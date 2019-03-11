@@ -3,18 +3,18 @@ import javax.management.openmbean.KeyAlreadyExistsException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LFUCache {
+public class LFUCache <T>{
 
-    Map<String, LFUNode> lookupMap;
+    Map<T, LFUNode<T>> lookupMap;
     LFUNodeList headFrequencyListNode;
 
     public LFUCache() {
-        lookupMap = new HashMap<String, LFUNode>();
+        lookupMap = new HashMap<T, LFUNode<T>>();
         headFrequencyListNode = new LFUNodeList(1);
     }
 
-    public void addNewLFUNode(String data)throws KeyAlreadyExistsException{
-        LFUNode node = new LFUNode(data);
+    public void addNewLFUNode(T data)throws KeyAlreadyExistsException{
+        LFUNode<T> node = new LFUNode(data);
         if(lookupMap.get(node.getData()) != null){
             throw new KeyAlreadyExistsException();
         }
@@ -33,9 +33,9 @@ public class LFUCache {
         lookupMap.put(node.getData(), node);
     }
 
-    public int accessLFUNode(String data){
+    public int accessLFUNode(T data){
         LFUNodeList newFrequencyListNode = null;
-        LFUNode node = lookupMap.get(data);
+        LFUNode<T> node = lookupMap.get(data);
         if(node == null){
             throw new IllegalArgumentException("Node not Present");
         }
@@ -60,15 +60,14 @@ public class LFUCache {
         return newFrequency;
     }
 
-    private void deleteLFUNodeFromParent(LFUNode node, LFUNodeList currentFrequencyListNode ) {
+    private void deleteLFUNodeFromParent(LFUNode<T> node, LFUNodeList currentFrequencyListNode ) {
         currentFrequencyListNode.deleteFromList(node);
         if(currentFrequencyListNode.getListSize() == 0){
             delete(currentFrequencyListNode);
         }
     }
 
-    public void deleteLFUNode(String data) {
-
+    public void deleteLFUNode(T data) {
         LFUNode node = lookupMap.get(data);
         if(node == null){
             throw new IllegalArgumentException("Node not Present");
@@ -111,8 +110,8 @@ public class LFUCache {
         return count;
     }
 
-    public String popLFUNode(){
-        LFUNode node = null;
+    public T popLFUNode(){
+        LFUNode<T> node = null;
         if(headFrequencyListNode != null){
             node = headFrequencyListNode.popFromList();
         }
